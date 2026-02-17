@@ -134,4 +134,4 @@ MIT License. See [LICENSE](LICENSE) file.
 
 David Martin Venti  
 info@dmartin.ch  
-Payerne, Switzerland
+Switzerland
