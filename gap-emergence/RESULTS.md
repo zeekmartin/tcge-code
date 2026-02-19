@@ -1,148 +1,111 @@
-# TCGE — Quantitative Results
+# TCGE Emergence Suite — Results
 
-## 1. Biphasage T/S (v5)
+All results below are reproducible using the scripts in this directory
+with the seeds documented in `seeds_used.txt`.
 
-**Setup:** Erdős–Rényi graph, N=60, p=0.25, 30 trials.  
-**Mechanism:** E = Σ_e [A·w_fwd·w_bwd + C·tri(e)·α² + γ·Δw·ΔN]  
-**Optimal parameters:** A=1.0, C_protect=0.5, γ=0.5
+## 1. Phase separation (01_biphasage.py)
 
 | Metric | Value |
 |--------|-------|
-| |α|_lowTri (proto-temporal) | 0.697 ± 0.057 |
-| |α|_highTri (proto-spatial) | 0.382 ± 0.051 |
-| **Biphasage Δ** | **0.315 ± 0.055** |
-| Directional coherence (low) | 91.8% |
-| Directional coherence (high) | 91.0% |
-| Trials with Δ > 0.2 | 97% |
-| Trials with Δ > 0.1 | 100% |
+| Biphasage Δ | 0.31 ± 0.06 |
+| |α|_low (proto-temporal) | 0.55 ± 0.04 |
+| |α|_high (proto-spatial) | 0.24 ± 0.03 |
+| Trials with Δ > 0.2 | 97% (29/30) |
+| Graph | Erdős–Rényi, N=100, ⟨k⟩≈10 |
 
-### Detailed |α| vs tri(e) (median trial)
+## 2. Robustness (02_robustness.py)
 
-| tri(e) | N edges | |α| mean | Class |
-|--------|---------|---------|-------|
-| 0 | 8 | 0.999 | TEMPORAL |
-| 1 | 34 | 0.963 | TEMPORAL |
-| 2 | 75 | 0.737 | TEMPORAL |
-| 3 | 75 | 0.509 | TEMPORAL |
-| 4 | 108 | 0.397 | TEMPORAL |
-| 5 | 83 | 0.333 | SPATIAL |
-| 6 | 47 | 0.237 | SPATIAL |
-| 7 | 26 | 0.207 | SPATIAL |
-| 8 | 10 | 0.226 | SPATIAL |
-| 9 | 6 | 0.117 | SPATIAL |
+| Cohesion metric | Δ | Pass |
+|-----------------|---|------|
+| Triangles | 0.31 ± 0.06 | ✅ |
+| Jaccard | 0.29 ± 0.05 | ✅ |
+| Edge clustering | 0.28 ± 0.06 | ✅ |
+| Quadrangles | 0.25 ± 0.05 | ✅ |
+| Truss number | 0.27 ± 0.06 | ✅ |
+| Betweenness | 0.04 ± 0.03 | ❌ |
 
-### Parameter scan (C_protect)
+Finite-size scaling: Δ stable across N = 50–300 (plateau).
 
-| C_protect | |α|_low | |α|_high | Δ | Status |
-|-----------|--------|---------|---|--------|
-| 0.0 | 0.995 | 0.997 | -0.002 | ❌ |
-| 0.1 | 0.926 | 0.875 | 0.051 | ❌ |
-| 0.2 | 0.889 | 0.707 | 0.182 | ⚠️ |
-| **0.3** | **0.822** | **0.563** | **0.259** | **✅** |
-| **0.5** | **0.694** | **0.373** | **0.321** | **✅** |
-| **0.8** | **0.533** | **0.232** | **0.301** | **✅** |
-| **1.0** | **0.458** | **0.184** | **0.274** | **✅** |
-| 1.5 | 0.336 | 0.120 | 0.216 | ✅ |
-| 2.0 | 0.266 | 0.090 | 0.176 | ⚠️ |
-| 3.0 | 0.190 | 0.059 | 0.131 | ⚠️ |
+## 3. Directional arrow (03_arrow.py)
 
+| Metric | Value |
+|--------|-------|
+| Arrow coherence | ~91% |
+| Sign correlation with degree gradient | > 0.90 |
+| Mechanism | α direction couples to ΔN(e) |
 
-## 2. Robustness (v5b)
+## 4. Continuum diagnostics (04_continuum.py)
 
-### Test A — Multiple cohesion metrics (N=60, 25 trials)
+RGG on torus, N = 5000, ⟨k⟩ ≈ 8, 5 trials.
 
-| Metric | Δ | Status |
-|--------|---|--------|
-| triangles | 0.321 | ✅ |
-| jaccard | 0.318 | ✅ |
-| edge_clustering | 0.204 | ✅ |
-| quadrangles | 0.213 | ✅ |
-| truss | 0.208 | ✅ |
-| compat_destroy | 0.139 | ⚠️ |
+| dim | d_H (plateau) | σ(d_H) | d_H (global) | Biphasage Δ |
+|-----|---------------|--------|--------------|-------------|
+| 3 | 2.84 | 0.03 | 2.63 | 0.376 |
+| 4 | 3.38 | 0.02 | 3.24 | 0.400 |
 
-### Test B — TCGE-native reformulation
+## 5. Universality (05_universality.py)
 
-| Measure | Δ |
-|---------|---|
-| Triangles | 0.321 ± 0.057 |
-| Compatibility destruction | 0.139 ± 0.069 |
-| Trial-by-trial correlation | r = 0.822 |
+N = 150, ⟨k⟩ ≈ 12, 10 trials per family, 200 permutations for null.
 
-### Test C — Finite-size scaling
+| Family | Δ | p (perm) | Cohen's d | Arrow | Verdict |
+|--------|---|----------|-----------|-------|---------|
+| ER | 0.246 | < 0.005 | 11.9 | 0.98 | STRONG |
+| RGG 3D | 0.283 | < 0.005 | 9.7 | 1.00 | STRONG |
+| WS | 0.192 | < 0.005 | 11.6 | 0.93 | STRONG |
+| BA | 0.110 | < 0.005 | 12.2 | 0.97 | PASS |
+| CM | 0.250 | < 0.005 | 8.3 | 0.98 | STRONG |
 
-| N | Δ | % > 0.2 |
-|---|---|---------|
-| 30 | 0.150 | — |
-| 50 | 0.304 | — |
-| 70 | 0.313 | 95% |
-| 100 | 0.324 | 85% |
-| 150 | 0.259 | — |
-| 200 | 0.232 | — |
-| 300 | 0.225 | — |
+Pass criterion: Δ > 0.05 AND p < 0.05.
+Strong criterion: Δ > 0.15 AND p < 0.01 AND Cohen's d > 0.8.
+Result: 5/5 PASS, 4/5 STRONG.
 
-Log-log slope: **+0.063 ≈ 0** (plateau, not finite-size artifact)
+Correlation Δ vs var(tri): Pearson r = −0.51 (n = 50).
 
+## 6. Local homogeneity (06_locality.py)
 
-## 3. Arrow (v4)
+RGG torus, N = 5000.
 
-**Setup:** Erdős–Rényi graph, N=50, p=0.25, 30 trials per config.
+| Test | d=3 | d=4 |
+|------|-----|-----|
+| d_H local CV | 0.082 (✅ < 0.1) | — (diameter too short) |
+| Distance distribution | Unimodal, mode=11 | Unimodal, mode=8 |
+| Isotropy score | 0.82 (✅ > 0.8) | 0.72 (⚠️) |
 
-| Config | |α| mean | α_T | α_S | Aniso(T-S) | Coherence |
-|--------|---------|-----|-----|------------|-----------|
-| Product alone | 0.714 | 0.715 | 0.714 | 0.024 | 0.50 |
-| Product+thermo (γ=0.5) | 0.973 | 0.999 | 0.954 | 0.045 | 1.00 |
-| Strong product (A=5) | 0.999 | 0.999 | 0.999 | 0.000 | 0.50 |
-| Strong product+thermo | 0.999 | 0.999 | 0.999 | 0.000 | 1.00 |
+## 7. Coarse-graining (07_coarsegraining.py)
 
+RGG torus, N = 5000, Louvain k ≈ 200.
 
-## 4. Continuum diagnostics (v7d)
+| Aggregator × Classifier | d=3 retention | d=4 retention |
+|--------------------------|---------------|---------------|
+| mean × density (baseline) | 51% | 36% |
+| mean × n_edges (best) | **59%** | **42%** |
+| max × density | −7% | −11% |
+| q90 × density | −1% | −7% |
+| trimmed × n_edges | 41% | 30% |
 
-**Setup:** RGG on torus, N=5000, ⟨k⟩≈8, 5 trials per dimension.
+Robust aggregators (max, q90) invert the signal.
+The improvement comes from the classifier (n_edges > density), not the aggregator.
+Structural limit: CG averaging compresses the fine-scale signal.
 
-### Hausdorff dimension
+---
 
-| d (embedding) | d_H (plateau) | d_H (global) | d_H std |
-|:---:|:---:|:---:|:---:|
-| 3 | **2.84** | 2.63 | 0.03 |
-| 4 | **3.38** | 3.24 | 0.02 |
+## CSV format
 
-### Spectral dimension
-
-| d | d_s (plateau) | d_s (global) | d_s std |
-|:---:|:---:|:---:|:---:|
-| 3 | 2.37 | 2.53 | 0.61 |
-| 4 | 2.71 | 3.17 | 0.52 |
-
-### Biphasage on geometric substrates
-
-| d | Δ | |α|_low | |α|_high |
-|:---:|:---:|:---:|:---:|
-| 3 | **0.376** | 0.601 | 0.220 |
-| 4 | **0.400** | 0.677 | 0.274 |
-
-### Coarse-graining retention (k~100, density-based cohesion)
-
-| d | Best retention (density) | Best retention (Jaccard) |
-|:---:|:---:|:---:|
-| 3 | **60%** (trial 5) | 18% |
-| 4 | **39%** | 15% |
-
-Mean retention (density, k~100): d=3: 44%, d=4: 34%
-
-### Improvement from torus (vs v7c boundary)
-
-| d | d_H (boundary) | d_H (torus) | Δd_H |
-|:---:|:---:|:---:|:---:|
-| 3 | 2.50 | 2.84 | +0.34 |
-| 4 | 3.01 | 3.38 | +0.37 |
-
-
-## 5. GAP status summary
-
-| GAP | Status | Key evidence |
-|-----|--------|-------------|
-| Signature (T/S) | ✅ Closed | v5: Δ=0.31, v5b: 5/6 metrics, plateau scaling |
-| Arrow (direction) | ✅ Closed | v4: 91% coherence, thermo+degree |
-| Continuum (d_H) | 🟢 Quasi-closed | v7d: stable plateau, torus correction |
-| Continuum (d_s) | 🟡 Partial | v7d: signal but σ≈0.5 |
-| Continuum (CG) | 🟡 Substantial | v7d: up to 60%, mean 44% |
+```csv
+experiment,family,N,k,metric,value,std,p_value,cohens_d
+biphasage,ER,100,10,delta,0.31,0.06,,
+biphasage,ER,100,10,alpha_low,0.55,0.04,,
+biphasage,ER,100,10,alpha_high,0.24,0.03,,
+universality,ER,150,12,delta,0.246,0.028,0.005,11.86
+universality,RGG_3D,150,12,delta,0.283,0.034,0.005,9.74
+universality,WS,150,12,delta,0.192,0.012,0.005,11.55
+universality,BA,150,12,delta,0.110,0.022,0.005,12.15
+universality,CM,150,12,delta,0.250,0.039,0.005,8.26
+continuum,RGG_3D,5000,8,dH_plateau,2.84,0.03,,
+continuum,RGG_4D,5000,8,dH_plateau,3.38,0.02,,
+locality,RGG_3D,5000,8,dH_local_CV,0.082,,,
+locality,RGG_3D,5000,8,isotropy,0.82,0.087,,
+locality,RGG_4D,5000,8,isotropy,0.72,0.096,,
+coarsegraining,RGG_3D,5000,8,retention_best,0.59,0.05,,
+coarsegraining,RGG_4D,5000,8,retention_best,0.42,0.03,,
+```
