@@ -135,3 +135,19 @@ It was **created** by the triangles.
 S = |μ₂ − μ₁| × 2·min(π₁, 1−π₁) from a 2-component Beta mixture on |α|.
 Validated against Δ on standard graphs: corr(S, Δ) = 0.947.
 S remains interpretable when tri → 0 (where Δ collapses as a measurement artifact).
+
+## Causal controls (dim_controls.py)
+
+Double-dissociation experiment at identical graph size (N=3000, ⟨k⟩=8):
+
+| Condition | ⟨tri⟩ | S | μ₁ | Interpretation |
+|-----------|-------|------|------|----------------|
+| ER baseline | 0.02 | 0.003 | 0.84 | no separation |
+| C1: random rewire (no tri created) | 0.02 | 0.003 | 0.83 | no separation |
+| C2: tri-close + protector OFF | 1.03 | 0.002 | 0.87 | triangles present but invisible to cost |
+| REF: tri-close + protector ON | 1.03 | **0.144** | **0.07** | two populations emerge |
+
+**Neither triangles alone nor rewiring alone produce separation.**
+Only triangles + active protector in the cost functional creates the T/S structure.
+This is a double dissociation: the causal chain is
+`triangles × protector → heterogeneous polarization → Lorentzian signature`.
