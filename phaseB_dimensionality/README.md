@@ -9,6 +9,9 @@
 | `dim_scan.py` | Scan d=2→7 at fixed N, plus scaled-N continuum diagnostics for d=2,3,4 |
 | `dim_robustness.py` | Vary ⟨k⟩ at fixed d to test whether the dimensional sweet spot is real |
 
+| `dim_rewire_inverse.py` | Inverse rewiring: ER → add triangles → watch T/S emerge |
+| `metric_S.py` | Mixture-model separation score S (independent of tri classifier) |
+
 ## Key finding
 
 The triangle protector does not control the **amount** of polarization —
@@ -37,11 +40,11 @@ the competition term C_protect × tri(e) in the gradient that controls the equil
 
 - TCGE does **not** select d = 4
 - Dimension is a proxy for triangle density at a given mean degree
-- The triangle protector's role is not to limit polarization, but to **structure** it:
-  it creates the spatial heterogeneity between proto-temporal and proto-spatial edges
-- Without the protector, all edges polarize uniformly — no Lorentzian signature
-- The protector is therefore **necessary** for emergent spacetime structure, not just
-  a regularizer
+- The triangle protector's role is not to limit polarization, but to **create two distinct
+  populations**: without it, all edges polarize to |α| ≈ 0.98 (one population), and the
+  proto-spatial class vanishes entirely (π₁ → 0 in mixture model)
+- The protector is therefore **constitutive** of emergent spacetime structure: it is the
+  mechanism that produces the T/S distinction, not a regularizer of a pre-existing one
 
 ## Causal control: rewiring (dim_causal.py)
 
@@ -63,6 +66,35 @@ edges resist polarization (proto-spatial) while others polarize
 (proto-temporal), creating the heterogeneity required for Lorentzian
 signature.
 
+## Tri-independent separation metric S (metric_S.py)
+
+The classical biphasage Δ uses tri(e) as both protector AND classifier. To measure
+separation independently, we fit a 2-component Beta mixture model on |α|:
+
+```
+S = |μ₂ - μ₁| × 2·min(π₁, 1-π₁)
+```
+
+where μ₁, μ₂ are component means and π₁ is the weight of the low-|α| component.
+
+**Validation:** S correlates with Δ at r = 0.947 on standard graphs (ER + RGG).
+
+**Rewiring result:** S drops FASTER than Δ — and this is correct. The mixture model
+reveals that the proto-spatial population (low |α|) physically vanishes (π₁: 22% → 0%)
+rather than just becoming unmeasurable. The protector doesn't just enable measurement
+of two populations — it creates them.
+
+| rewire% | π₁ (proto-spatial) | S | Δ |
+|---------|-------------------|-------|-------|
+| 0% | 22% | 0.112 | 0.369 |
+| 10% | 18% | 0.157 | 0.502 |
+| 30% | 7% | 0.038 | 0.299 |
+| 90% | 0% | 0.001 | 0.139 |
+
+This corrects the earlier histogram-based bimodality test that suggested
+separation persists to 50% rewiring — it was an artifact of valley-detection
+in a nearly unimodal distribution.
+
 ## Trajectory of understanding
 
 1. **Initial hypothesis** (dim_scan.py): Δ ~ tri/diam, r = 0.986 on 6 points
@@ -70,7 +102,36 @@ signature.
 3. **Refined hypothesis**: Δ ~ −⟨tri⟩, r = −0.98 on 15 points
 4. **Deepened** (dim_causal.py): tri doesn't control polarization magnitude
    but its spatial heterogeneity — the protector creates the T/S structure
+5. **Confirmed** (metric_S.py): tri-independent mixture model shows the
+   proto-spatial population physically vanishes without triangles (π₁→0),
+   not just that the measurement fails
 
 Each step killed the previous interpretation and replaced it with
 something more fundamental. This is documented honestly as a model
 of scientific self-correction.
+
+## Inverse rewiring: mirror proof (dim_rewire_inverse.py)
+
+Starting from ER (⟨tri⟩ ≈ 0), triangle-closing rewiring progressively
+adds triangles while preserving degrees exactly. The separation score S
+(mixture-model based, independent of tri classifier) rises from 0.003 to 0.173:
+
+| ⟨tri⟩ | S | ⟨\|α\|⟩ | μ₁ | μ₂ | Interpretation |
+|-------|------|---------|------|------|----------------|
+| 0.02 | 0.003 | 0.987 | 0.83 | 0.98 | one population, uniform polarization |
+| 0.30 | 0.013 | 0.955 | 0.02 | 0.68 | first proto-spatial nuclei |
+| 1.04 | 0.148 | 0.857 | 0.07 | 0.90 | two distinct populations |
+| 1.27 | 0.173 | 0.821 | 0.06 | 0.90 | stable T/S separation |
+
+The proto-spatial population (μ₁ ≈ 0.06) did not exist in the ER graph.
+It was **created** by the triangles.
+
+**Symmetry with destruction experiment:**
+- Destroying triangles (RGG → rewire): S drops, 2 populations → 1
+- Creating triangles (ER → tri-close): S rises, 1 population → 2
+
+## Separation metric S (metric_S.py)
+
+S = |μ₂ − μ₁| × 2·min(π₁, 1−π₁) from a 2-component Beta mixture on |α|.
+Validated against Δ on standard graphs: corr(S, Δ) = 0.947.
+S remains interpretable when tri → 0 (where Δ collapses as a measurement artifact).
